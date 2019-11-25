@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class ParallelSimulation
 {
 	static volatile int killed = 0;
+	static volatile List<String> undetectedMutants = new ArrayList<String>();
 
 	public static void main(String args[])
 	{
@@ -31,12 +32,9 @@ public class ParallelSimulation
 		System.out.println(partitions.get(1));
 		System.out.println(partitions.get(2));
 
-		int arg1 = 1;
-		int arg2 = 2;
-		String funcName = "add";
-
 		MyClassLoader original = new MyClassLoader(null);
-		int expected = original.simulate(original, "File.java", funcName, arg1, arg2);
+		int expected = original.simulate(original, "File.java", args[1], Integer.parseInt(args[2]),
+				Integer.parseInt(args[3]));
 		System.out.println("\nOriginal code expected output: " + expected);
 		System.out.println("Creating Executor Service with a thread pool of size 3");
 		ExecutorService executorService = Executors.newFixedThreadPool(3);
@@ -46,11 +44,16 @@ public class ParallelSimulation
 			for (String s : partitions.get(0))
 			{
 				MyClassLoader cl = new MyClassLoader(null);
-				int out = original.simulate(cl, s, funcName, arg1, arg2);
+				int out = original.simulate(cl, s, args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+				String[] path = s.split("/");
 				if (out != expected)
 				{
-					System.out.println("mutant killed in task 1!");
+					System.out.println("mutant: " + path[path.length - 1] + " killed in task 1!");
 					killed++;
+				}
+				else
+				{
+					undetectedMutants.add(path[path.length - 1]);
 				}
 			}
 		};
@@ -60,11 +63,16 @@ public class ParallelSimulation
 			for (String s : partitions.get(1))
 			{
 				MyClassLoader cl = new MyClassLoader(null);
-				int out = original.simulate(cl, s, funcName, arg1, arg2);
+				int out = original.simulate(cl, s, args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+				String[] path = s.split("/");
 				if (out != expected)
 				{
-					System.out.println("mutant killed in task 2!");
+					System.out.println("mutant: " + path[path.length - 1] + " killed in task 2!");
 					killed++;
+				}
+				else
+				{
+					undetectedMutants.add(path[path.length - 1]);
 				}
 			}
 		};
@@ -74,11 +82,16 @@ public class ParallelSimulation
 			for (String s : partitions.get(2))
 			{
 				MyClassLoader cl = new MyClassLoader(null);
-				int out = original.simulate(cl, s, funcName, arg1, arg2);
+				int out = original.simulate(cl, s, args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+				String[] path = s.split("/");
 				if (out != expected)
 				{
-					System.out.println("mutant killed in task 3!");
+					System.out.println("mutant: " + path[path.length - 1] + " killed in task 3!");
 					killed++;
+				}
+				else
+				{
+					undetectedMutants.add(path[path.length - 1]);
 				}
 			}
 		};
@@ -91,7 +104,9 @@ public class ParallelSimulation
 		try
 		{
 			executorService.awaitTermination(5, TimeUnit.MINUTES);
-			System.out.println(killed);
+			System.out.println("Total mutants killed: " + killed);
+			System.out.println("Mutant coverage: " + (killed / filepaths.size()) * 100);
+			System.out.println("Undetected mutants: " + undetectedMutants);
 		}
 		catch (InterruptedException e)
 		{
