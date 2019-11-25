@@ -109,20 +109,37 @@ public class Main
 			List<Mutation> mutations = mutate(str);
 			if (mutations != null)
 			{
-				System.out.printf("%5d  %s\n", line, str);
 				for (Mutation m : mutations)
 				{
-					System.out.printf("\t%3d:%d  %s: %s\n", line, m.index, m.mutation, Arrays.toString(m.mutations));
-					// create new file for each mutations
+					System.out.println("Line index: " + line + ", line: '" + str + "', character index: " + m.index
+							+ ", original operator: " + m.mutation + ", possible mutants: "
+							+ Arrays.toString(m.mutations));
+					// create new file for each mutations+
 					for (int i = 0; i < m.mutations.length; i++)
 					{
 						String mutation = m.mutations[i];
-						System.out.println(file.getName());
 						String[] path = file.getName().split("\\.");
 						if (path.length > 1)
 						{
+							String mutationString = "";
+							if (mutation == "+")
+							{
+								mutationString = "PLUS";
+							}
+							else if (mutation == "-")
+							{
+								mutationString = "MINUS";
+							}
+							else if (mutation == "*")
+							{
+								mutationString = "MULTIPLY";
+							}
+							else
+							{
+								mutationString = "DIVIDE";
+							}
 							path[path.length - 2] = path[path.length - 2]
-									+ String.format("_l%d_i%d_m%d", line, m.index, i);
+									+ String.format("_line%d_index%d_mutant_%s", line, m.index, mutationString);
 						}
 
 						File dir = new File(file.getParent() + "/FaultList/");
