@@ -4,21 +4,11 @@ and generates arithmetic operation mutants and store them in the 'library_of_mut
 """
 import sys
 
-def generate():
+def generate(file):
     # define mutant dict
     # keys = types of mutants
     # values = total number of each mutant
     MUTANTS = {}.fromkeys(['+', '-', '*', '/'], 0)
-
-    # reads file path from input
-    file_path = input("Enter the name of the file to perform mutation testing on: \n")
-
-    # open file
-    try:
-        file = open(file_path, 'r')
-    except FileNotFoundError as e:
-        print("Error processing file path.")
-        sys.exit(1)
 
     # redirect output to file that stores the library of mutants
     sys.stdout = open('library_of_mutants.txt', 'w')

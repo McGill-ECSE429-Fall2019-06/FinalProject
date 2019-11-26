@@ -9,7 +9,6 @@ import threading
 path = "mutants_file/"
 test_vectors_file = "TestVectors.txt"
 mutants_library_path = "library_of_mutants.txt"
-SUT_file = 'SUT.py'
 num_threads = 3
 
 # custom sorting function
@@ -45,8 +44,8 @@ def get_test_vector():
         return test_vectors
 
 
-def evaluation(name, tasks, mutated_files, test_vectors, mutant_list):
-    print("Thread {}: starting {}".format(name, tasks))
+def evaluation(name, tasks, mutated_files, test_vectors, mutant_list, SUT_file):
+    print("Thread {}: starting ...".format(name))
     for i in tasks:
         #print(f + "in thread " + str(name))
         for v in test_vectors:
@@ -95,7 +94,7 @@ def write_back(lines):
         print("\nMutant Coverage: {0:.2%}".format(killed / total_mutants))
 
 
-def parallel_simulation():
+def parallel_simulation(SUT_file):
     # splitting the mutated files among number of threads
     mutated_files = sort_files()
     # tasks splits the indexes in the mutated_files
@@ -112,7 +111,7 @@ def parallel_simulation():
     for index in range(num_threads):
         print("Main    : create and start thread {}.".format(index))
         t = threading.Thread(target=evaluation, args=(index, tasks[index],
-                                                      mutated_files, test_vectors, mutant_list))
+                                                      mutated_files, test_vectors, mutant_list, SUT_file))
         threads.append(t)
         t.start()
 

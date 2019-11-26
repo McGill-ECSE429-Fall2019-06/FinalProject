@@ -6,10 +6,9 @@ import csv
 import os
 
 mutants_file_path = "library_of_mutants.txt"
-source_path = "SUT.py"
 mutant_dict = dict({"+":'plus', "-":'minus', "*":'multiply', "/":"divide"})
 
-def injection():
+def injection(source_path):
     # open mutants fault list file
     try:
         mutants_file = open(mutants_file_path,'r')
