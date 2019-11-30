@@ -9,16 +9,10 @@ import threading
 path = "mutants_file/"
 test_vectors_file = "TestVectors.txt"
 mutants_library_path = "library_of_mutants.txt"
-num_threads = 3
 
 # custom sorting function
 def cmp_number(f1):
     return int(f1.split(',')[0])
-
-
-def split(a,n):
-    k,m = divmod(a,n)
-    return (a[i*k + min(i,m):(i+1) * k + min(i+1,m)] for i in range(n))
 
 
 def get_lines(file_path):
@@ -31,8 +25,6 @@ def sort_files():
     # get all mutated files
     mutated_files = [f for f in listdir(path) if isfile(join(path, f))]
     mutated_files = [join(path, f) for f in sorted(mutated_files, key=cmp_number)]
-    # key in the dict represent the line number of the mutant in the mutant list
-    #return dict(list(enumerate(mutated_files, 2)))
     return mutated_files
 
 
@@ -49,6 +41,9 @@ def evaluation(name, tasks, mutated_files, test_vectors, mutant_list, SUT_file):
     for i in tasks:
         #print(f + "in thread " + str(name))
         for v in test_vectors:
+            # skip empty lines
+            if not v:
+                continue
             arg1, arg2 = v.split(',')
 
             # running the SUT with test vector
@@ -94,7 +89,7 @@ def write_back(lines):
         print("\nMutant Coverage: {0:.2%}".format(killed / total_mutants))
 
 
-def parallel_simulation(SUT_file):
+def parallel_simulation(SUT_file, num_threads):
     # splitting the mutated files among number of threads
     mutated_files = sort_files()
     # tasks splits the indexes in the mutated_files
@@ -119,13 +114,3 @@ def parallel_simulation(SUT_file):
         t.join()
 
     write_back(mutant_list)
-
-
-
-
-
-
-
-
-
-

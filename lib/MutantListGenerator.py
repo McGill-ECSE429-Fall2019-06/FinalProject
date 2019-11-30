@@ -34,3 +34,4 @@ def generate(file):
     print('\nTotal number of mutants of each type generated: ')
     print("\n".join("{}\t{}".format(k, v) for k, v in MUTANTS.items()))
     sys.stdout = sys.__stdout__
+

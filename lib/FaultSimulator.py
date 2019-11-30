@@ -38,12 +38,10 @@ with open(mutants_library_path, 'r') as file:
 
                 # running the SUT with test vector
                 correct_out = run(['python', SUT_file, arg1, arg2], stdout=PIPE).stdout.decode('utf-8')
-                print('correct' + correct_out, end='')
 
                 # running the mutant files with test vector
                 # spawning a subprocess to execute the mutated files
                 mutant_out = run(['python', f, arg1, arg2], stdout=PIPE).stdout.decode('utf-8')
-                print('mutant' + mutant_out, end='')
 
 
                 if correct_out != mutant_out:
