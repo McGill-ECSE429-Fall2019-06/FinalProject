@@ -46,13 +46,18 @@ public class ParallelSimulation
 		System.out.println(partitions.get(1));
 		System.out.println(partitions.get(2));
 
+		long startTime = System.currentTimeMillis();
+
 		for (String vector : vectors)
 		{
 			String[] vectorArgs = vector.split(",");
 
+			int a = Integer.parseInt(vectorArgs[0]);
+			int b = Integer.parseInt(vectorArgs[1]);
+			int c = Integer.parseInt(vectorArgs[2]);
+
 			MyClassLoader original = new MyClassLoader(null);
-			int expected = original.simulate(original, "File.java", funcName, Integer.parseInt(vectorArgs[0]),
-					Integer.parseInt(vectorArgs[1]));
+			int expected = original.simulate(original, "File.java", funcName, a, b, c);
 			System.out.println("\nOriginal code expected output: " + expected);
 			System.out.println("Creating Executor Service with a thread pool of size 3");
 			ExecutorService executorService = Executors.newFixedThreadPool(3);
@@ -62,8 +67,7 @@ public class ParallelSimulation
 				for (String s : partitions.get(0))
 				{
 					MyClassLoader cl = new MyClassLoader(null);
-					int out = original.simulate(cl, s, funcName, Integer.parseInt(vectorArgs[0]),
-							Integer.parseInt(vectorArgs[1]));
+					int out = original.simulate(cl, s, funcName, a, b, c);
 					String[] path = s.split("/");
 					if (out != expected)
 					{
@@ -71,13 +75,13 @@ public class ParallelSimulation
 						if (!killed.containsKey(path[path.length - 1]))
 						{
 							List<String> killerVectors = new ArrayList<String>();
-							killerVectors.add("(" + vectorArgs[0] + ", " + vectorArgs[1] + ")");
+							killerVectors.add("(" + String.join(", ", vectorArgs) + ")");
 							killed.put(path[path.length - 1], killerVectors);
 						}
 						else
 						{
 							List<String> killerVectors = killed.get(path[path.length - 1]);
-							killerVectors.add("(" + vectorArgs[0] + ", " + vectorArgs[1] + ")");
+							killerVectors.add("(" + String.join(", ", vectorArgs) + ")");
 							killed.put(path[path.length - 1], killerVectors);
 						}
 					}
@@ -89,8 +93,7 @@ public class ParallelSimulation
 				for (String s : partitions.get(1))
 				{
 					MyClassLoader cl = new MyClassLoader(null);
-					int out = original.simulate(cl, s, funcName, Integer.parseInt(vectorArgs[0]),
-							Integer.parseInt(vectorArgs[1]));
+					int out = original.simulate(cl, s, funcName, a, b, c);
 					String[] path = s.split("/");
 					if (out != expected)
 					{
@@ -98,13 +101,13 @@ public class ParallelSimulation
 						if (!killed.containsKey(path[path.length - 1]))
 						{
 							List<String> killerVectors = new ArrayList<String>();
-							killerVectors.add("(" + vectorArgs[0] + ", " + vectorArgs[1] + ")");
+							killerVectors.add("(" + String.join(", ", vectorArgs) + ")");
 							killed.put(path[path.length - 1], killerVectors);
 						}
 						else
 						{
 							List<String> killerVectors = killed.get(path[path.length - 1]);
-							killerVectors.add("(" + vectorArgs[0] + ", " + vectorArgs[1] + ")");
+							killerVectors.add("(" + String.join(", ", vectorArgs) + ")");
 							killed.put(path[path.length - 1], killerVectors);
 						}
 					}
@@ -116,8 +119,7 @@ public class ParallelSimulation
 				for (String s : partitions.get(2))
 				{
 					MyClassLoader cl = new MyClassLoader(null);
-					int out = original.simulate(cl, s, funcName, Integer.parseInt(vectorArgs[0]),
-							Integer.parseInt(vectorArgs[1]));
+					int out = original.simulate(cl, s, funcName, a, b, c);
 					String[] path = s.split("/");
 					if (out != expected)
 					{
@@ -125,13 +127,13 @@ public class ParallelSimulation
 						if (!killed.containsKey(path[path.length - 1]))
 						{
 							List<String> killerVectors = new ArrayList<String>();
-							killerVectors.add("(" + vectorArgs[0] + ", " + vectorArgs[1] + ")");
+							killerVectors.add("(" + String.join(", ", vectorArgs) + ")");
 							killed.put(path[path.length - 1], killerVectors);
 						}
 						else
 						{
 							List<String> killerVectors = killed.get(path[path.length - 1]);
-							killerVectors.add("(" + vectorArgs[0] + ", " + vectorArgs[1] + ")");
+							killerVectors.add("(" + String.join(", ", vectorArgs) + ")");
 							killed.put(path[path.length - 1], killerVectors);
 						}
 					}
@@ -166,9 +168,12 @@ public class ParallelSimulation
 			System.out.println(filename + " is killed by vectors: " + vectorsList);
 		}
 
+		long endTime = System.currentTimeMillis();
+
 		System.out.println("Total mutants killed: " + killed.size());
 		System.out.println("Total number of files: " + filepaths.size());
 		System.out.println("Mutant coverage: " + ((float) killed.size() / filepaths.size()) * 100 + "%");
+		System.out.println("Running time (ms): " + (endTime - startTime));
 	}
 
 	public static List<List<String>> arraySplitter(int num, List<String> list)

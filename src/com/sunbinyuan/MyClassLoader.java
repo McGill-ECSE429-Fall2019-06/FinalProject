@@ -88,15 +88,15 @@ public class MyClassLoader extends ClassLoader
 		}
 	}
 
-	public int simulate(MyClassLoader cl, String filepath, String functionName, int arg1, int arg2)
+	public int simulate(MyClassLoader cl, String filepath, String functionName, int arg1, int arg2, int arg3)
 	{
 		try
 		{
 			List<ClassFile> list = cl.compile(filepath, "File");
 			Class<?> clazz = cl.loadClass(list.get(0).outputStream.toByteArray(), list.get(0).getName());
-			Method m = clazz.getMethod(functionName, new Class[] { int.class, int.class });
+			Method m = clazz.getMethod(functionName, new Class[] { int.class, int.class, int.class });
 			Object instance = clazz.newInstance();
-			return (int) m.invoke(instance, arg1, arg2);
+			return (int) m.invoke(instance, arg1, arg2, arg3);
 		}
 		catch (FileNotFoundException e)
 		{
